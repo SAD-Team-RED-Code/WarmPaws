@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "Keep Your Pets Warm Indoors",
+    "description": "Ensure your pets have a warm and cozy area inside your home during cold months.",
+    "provider": "PetCare Co.",
+    "email": "info@petcare.com",
+    "price": 0,
+    "rating": 5,
+    "image": "images/tip1.png"
+  },
+  {
+    "id": 2,
+    "title": "Moisturize Their Paws",
+    "description": "Use pet-safe paw balms to prevent cracking or dryness from cold and ice.",
+    "provider": "SnowPaws",
+    "email": "contact@snowpaws.com",
+    "price": 0,
+    "rating": 4.8,
+    "image": "images/tip2.png"
+  },
+  {
+    "id": 3,
+    "title": "Dress Appropriately",
+    "description": "Small and short-haired pets may need sweaters or jackets during outdoor walks.",
+    "provider": "CozyCompanions",
+    "email": "hello@cozycompanions.com",
+    "price": 0,
+    "rating": 4.7,
+    "image": "images/tip3.png"
+  },
+  {
+    "id": 4,
+    "title": "Limit Outdoor Time",
+    "description": "Avoid keeping pets outside for too long during freezing temperatures.",
+    "provider": "ActivePaws",
+    "email": "info@activepaws.com",
+    "price": 0,
+    "rating": 4.9,
+    "image": "images/tip4.png"
+  },
+  {
+    "id": 5,
+    "title": "Check for Hypothermia",
+    "description": "Monitor pets for shivering, lethargy, or cold extremities; act quickly if noticed.",
+    "provider": "HealthyPets",
+    "email": "support@healthypets.com",
+    "price": 0,
+    "rating": 4.8,
+    "image": "images/tip5.png"
+  },
+  {
+    "id": 6,
+    "title": "Winter Diet & Hydration",
+    "description": "Ensure pets eat well and have fresh water to maintain energy and warmth.",
+    "provider": "NutriPets",
+    "email": "hello@nutripets.com",
+    "price": 0,
+    "rating": 4.7,
+    "image": "images/tip6.png"
+  }
+]

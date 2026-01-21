@@ -1,0 +1,68 @@
+[
+  {
+    "serviceId": 1,
+    "serviceName": "Winter Coat Fitting for Dogs",
+    "providerName": "PawCare Studio",
+    "providerEmail": "info@pawcare.com",
+    "price": 25,
+    "rating": 4.9,
+    "description": "Custom coat fitting...",
+    "image": "images/dog1.png",
+    "category": "Clothing"
+  },
+  {
+    "serviceId": 2,
+    "serviceName": "Winter Grooming & Paw Treatment",
+    "providerName": "CozyPets Grooming",
+    "providerEmail": "hello@cozypets.com",
+    "price": 30,
+    "rating": 4.8,
+    "description": "Professional grooming...",
+    "image": "images/dog2.png",
+    "category": "Grooming"
+  },
+  {
+    "serviceId": 3,
+    "serviceName": "Pet Grooming in Winter",
+    "providerName": "FurryTails Salon",
+    "providerEmail": "care@furrytails.com",
+    "price": 30,
+    "rating": 4.8,
+    "description": "Keep your pets clean...",
+    "image": "images/dog3.png",
+    "category": "Grooming"
+  },
+  {
+  "serviceId": 4,
+  "serviceName": "Winter Paw Protection",
+  "providerName": "SnowPaws Care",
+  "providerEmail": "contact@snowpaws.com",
+  "price": 20,
+  "rating": 4.7,
+  "description": "Protect your pet’s paws from snow and ice with our safe winter paw balm.",
+  "image": "images/dog4.png",
+  "category": "Grooming"
+},
+{
+  "serviceId": 5,
+  "serviceName": "Heated Pet Bed Rental",
+  "providerName": "CozyCompanions",
+  "providerEmail": "hello@cozycompanions.com",
+  "price": 15,
+  "rating": 4.9,
+  "description": "Keep your pets warm during winter with our heated pet beds available for rent.",
+  "image": "images/dog5.png",
+  "category": "Accessories"
+},
+{
+  "serviceId": 6,
+  "serviceName": "Winter Pet Fitness Classes",
+  "providerName": "ActivePaws Studio",
+  "providerEmail": "info@activepaws.com",
+  "price": 35,
+  "rating": 4.8,
+  "description": "Fun indoor exercise sessions to keep pets healthy and active during cold months.",
+  "image": "images/dog6.png",
+  "category": "Fitness"
+}
+]
