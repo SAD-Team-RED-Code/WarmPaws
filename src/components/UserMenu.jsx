@@ -1,9 +1,8 @@
-// src/components/UserMenu.jsx
 import React, { useState, useRef } from "react";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { ClockLoader } from "react-spinners";
 
-const UserMenu = ({ user, loading, theme, setTheme, handleSignout }) => {
+const UserMenu = ({ user, loading, handleSignout }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -18,7 +17,6 @@ const UserMenu = ({ user, loading, theme, setTheme, handleSignout }) => {
           onMouseEnter={() => setDropdownOpen(true)}
           onMouseLeave={() => setDropdownOpen(false)}
         >
-
           <button className="focus:outline-none">
             <img
               src={user?.photoURL || "https://via.placeholder.com/88"}
@@ -27,9 +25,8 @@ const UserMenu = ({ user, loading, theme, setTheme, handleSignout }) => {
             />
           </button>
 
-
           {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 z-50 animate-fadeIn">
+            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 z-50">
               <h2 className="text-lg font-semibold text-orange-600 dark:text-yellow-300">
                 {user?.displayName}
               </h2>

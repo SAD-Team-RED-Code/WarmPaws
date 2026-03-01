@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"; // ✅ FIXED
+import { Link } from "react-router-dom"; 
 import logo from "../assets/img/logo.png";
 import MyContainer from "./MyContainer";
 import MyLink from "./MyLink";
@@ -47,15 +47,6 @@ const Navbar = () => {
             <li>
               <MyLink to="/">Home</MyLink>
             </li>
-
-            <li>
-              <MyLink to="/about-us">About Us</MyLink>
-            </li>
-
-            <li>
-              <MyLink to="/service">Services</MyLink>
-            </li>
-
             {/* ✅ NEW PAGES */}
             <li>
               <MyLink to="/products">Products</MyLink>
@@ -79,6 +70,16 @@ const Navbar = () => {
               </li>
             )}
 
+
+            <li>
+              <MyLink to="/about-us">About Us</MyLink>
+            </li>
+
+            <li>
+              <MyLink to="/service">Services</MyLink>
+            </li>
+
+            
           </ul>
         </nav>
 
