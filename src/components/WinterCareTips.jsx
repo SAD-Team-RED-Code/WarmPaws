@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { FaPaw } from "react-icons/fa";
 
 const WinterCareTips = () => {
   const [tips, setTips] = useState([]);
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(3);
+  const [expandedTip, setExpandedTip] = useState(null);
 
   useEffect(() => {
     fetch(`${import.meta.env.BASE_URL}data/tips.json`)
@@ -22,21 +24,25 @@ const WinterCareTips = () => {
     setVisibleCount(tips.length);
   };
 
+  const toggleReadMore = (id) => {
+    setExpandedTip(expandedTip === id ? null : id);
+  };
+
   if (loading) {
     return (
       <div className="text-center py-16 text-blue-500 font-semibold">
-        Loading winter care tips...
+        Loading care tips...
       </div>
     );
   }
 
   return (
-    <section className="max-w-6xl mx-auto px-6 py-16">
-      <h2 className="text-3xl md:text-4xl font-bold text-blue-600 text-center mb-12">
-        Winter Care Tips for Pets
+    <section className="max-w-6xl mx-auto px-6 py-16 bg-blue-50 rounded-3xl">
+      <h2 className="text-3xl md:text-4xl font-bold text-blue-700 text-center mb-12">
+         Care Tips for ANIMALS
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
         {tips.slice(0, visibleCount).map((tip) => (
           <div
             key={tip.id}
@@ -47,8 +53,34 @@ const WinterCareTips = () => {
               alt={tip.title}
               className="w-full h-48 object-cover rounded-2xl mb-4"
             />
-            <h3 className="text-xl font-bold text-blue-700 mb-2">{tip.title}</h3>
-            <p className="text-blue-800/90 text-sm mb-4">{tip.description}</p>
+
+            <div className="flex justify-center gap-2 mb-2">
+              {tip.category?.map((cat, i) => (
+                <span
+                  key={i}
+                  className="bg-blue-200 text-blue-800 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1"
+                >
+                  <FaPaw className="text-blue-500" /> {cat}
+                </span>
+              ))}
+            </div>
+
+            <h3 className="text-xl font-bold text-blue-800 mb-2">{tip.title}</h3>
+            <p className="text-blue-900/90 text-sm mb-2">
+              {expandedTip === tip.id
+                ? tip.description
+                : tip.description.length > 100
+                ? tip.description.slice(0, 100) + "..."
+                : tip.description}
+            </p>
+            {tip.description.length > 100 && (
+              <button
+                onClick={() => toggleReadMore(tip.id)}
+                className="text-blue-600 text-sm font-semibold mb-4 hover:underline"
+              >
+                {expandedTip === tip.id ? "Show Less" : "Read More"}
+              </button>
+            )}
 
             <div className="text-sm text-gray-600 mb-4">
               <p>
@@ -59,9 +91,13 @@ const WinterCareTips = () => {
               </p>
             </div>
 
-            <button className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold transition">
+            <a
+              href={tip.link || "#"}
+              target="_blank"
+              className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold transition"
+            >
               Learn More
-            </button>
+            </a>
           </div>
         ))}
       </div>
