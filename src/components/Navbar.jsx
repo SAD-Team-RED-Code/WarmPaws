@@ -1,4 +1,4 @@
-import { Link } from "react-router"; 
+import { Link } from "react-router-dom"; // ✅ FIXED
 import logo from "../assets/img/logo.png";
 import MyContainer from "./MyContainer";
 import MyLink from "./MyLink";
@@ -43,28 +43,42 @@ const Navbar = () => {
 
         <nav>
           <ul className="flex items-center gap-8 text-lg font-medium">
+
             <li>
-              <MyLink to="/" className="hover:text-orange-600 dark:hover:text-yellow-400 transition-colors">
-                Home
-              </MyLink>
+              <MyLink to="/">Home</MyLink>
             </li>
+
             <li>
-              <MyLink to="/about-us" className="hover:text-orange-600 dark:hover:text-yellow-400 transition-colors">
-                About Us
-              </MyLink>
+              <MyLink to="/about-us">About Us</MyLink>
             </li>
+
             <li>
-              <MyLink to="/service" className="hover:text-orange-600 dark:hover:text-yellow-400 transition-colors">
-                Services
-              </MyLink>
+              <MyLink to="/service">Services</MyLink>
             </li>
+
+            {/* ✅ NEW PAGES */}
+            <li>
+              <MyLink to="/products">Products</MyLink>
+            </li>
+
+            <li>
+              <MyLink to="/medical">Medical</MyLink>
+            </li>
+
+            <li>
+              <MyLink to="/adoption">Adoption</MyLink>
+            </li>
+
+            <li>
+              <MyLink to="/rescue">Rescue</MyLink>
+            </li>
+
             {user && (
               <li>
-                <MyLink to="/profile" className="hover:text-orange-600 dark:hover:text-yellow-400 transition-colors">
-                  Profile
-                </MyLink>
+                <MyLink to="/profile">Profile</MyLink>
               </li>
             )}
+
           </ul>
         </nav>
 
@@ -73,7 +87,7 @@ const Navbar = () => {
           loading={loading}
           theme={theme}
           setTheme={setTheme}
-          handleSignout={handleSignout} // ✅ make sure UserMenu uses this prop
+          handleSignout={handleSignout}
         />
       </MyContainer>
     </header>
