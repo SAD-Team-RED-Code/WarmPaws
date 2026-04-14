@@ -1,167 +1,387 @@
-import React, { useState } from "react";
-import { 
-  FaSyringe, 
-  FaStethoscope, 
-  FaTooth, 
-  FaAmbulance, 
-  FaHeartbeat, 
-  FaPaw, 
-  FaDragon, 
-  FaFeather, 
-  FaVideo, 
-  FaMapMarkerAlt, 
-  FaPhone, 
-  FaWhatsapp 
+import React, { useState, useEffect } from "react";
+import {
+  FaSyringe,
+  FaStethoscope,
+  FaTooth,
+  FaHeartbeat,
+  FaVideo,
+  FaSearch,
+  FaUserMd,
 } from "react-icons/fa";
 
-// Services with categories and map availability
+/* ===== SERVICES ===== */
 const services = [
-  { id: 1, title: "Vaccination", description: "Scheduled vaccines for dogs, cats, birds, reptiles.", icon: <FaSyringe className="text-green-600 text-4xl mb-3" />, mapAvailable: true, category: "General", emergency: false },
-  { id: 2, title: "Surgery", description: "Safe surgical care for all pets.", icon: <FaStethoscope className="text-green-600 text-4xl mb-3" />, mapAvailable: true, category: "General", emergency: true },
-  { id: 3, title: "Health Checkups", description: "Wellness exams for your pets.", icon: <FaHeartbeat className="text-green-600 text-4xl mb-3" />, mapAvailable: false, category: "General", emergency: false },
-  { id: 4, title: "Dental Care", description: "Teeth cleaning, extractions, and oral health.", icon: <FaTooth className="text-green-600 text-4xl mb-3" />, mapAvailable: false, category: "Dental", emergency: false },
-  { id: 5, title: "Omni Consultation", description: "Book a video consultation with any available doctor online.", icon: <FaVideo className="text-green-600 text-4xl mb-3" />, mapAvailable: false, category: "Online", emergency: false },
+  {
+    id: 1,
+    title: "Vaccination",
+    description: "Scheduled vaccines for pets.",
+    icon: <FaSyringe className="text-green-700 text-3xl" />,
+    category: "General",
+    emergency: false,
+  },
+  {
+    id: 2,
+    title: "Surgery",
+    description: "Safe surgical care.",
+    icon: <FaStethoscope className="text-green-700 text-3xl" />,
+    category: "General",
+    emergency: true,
+  },
+  {
+    id: 3,
+    title: "Health Checkups",
+    description: "Routine checkups.",
+    icon: <FaHeartbeat className="text-green-700 text-3xl" />,
+    category: "General",
+    emergency: false,
+  },
+  {
+    id: 4,
+    title: "Dental Care",
+    description: "Pet dental treatment.",
+    icon: <FaTooth className="text-green-700 text-3xl" />,
+    category: "Dental",
+    emergency: false,
+  },
+  {
+    id: 5,
+    title: "Online Consultation",
+    description: "Video consultation with doctors.",
+    icon: <FaVideo className="text-green-700 text-3xl" />,
+    category: "Online",
+    emergency: false,
+  },
 ];
 
-// Online doctors with map availability
-const onlineDoctors = [
-  { id: 1, name: "Dr. Bella", specialty: "Canine Specialist", online: true, mapAvailable: true },
-  { id: 2, name: "Dr. Max", specialty: "Feline Specialist", online: false, mapAvailable: false },
-  { id: 3, name: "Dr. Luna", specialty: "Exotic Pets", online: true, mapAvailable: true },
-  { id: 4, name: "Dr. Oliver", specialty: "Small Animals", online: true, mapAvailable: true },
+/* ===== DOCTORS ===== */
+const doctors = [
+  { id: 1, name: "Dr. Rahman", specialty: "Canine Specialist" },
+  { id: 2, name: "Dr. Ahmed", specialty: "Feline Specialist" },
+  { id: 3, name: "Dr. Luna", specialty: "Exotic Pets" },
+  { id: 4, name: "Dr. Oliver", specialty: "General Vet" },
 ];
 
-// FAQs
-const faqs = [
-  { question: "What pets do you treat?", answer: "We treat dogs, cats, birds, reptiles, and small animals across Bangladesh." },
-  { question: "Do you offer online consultation?", answer: "Yes! You can book a video call with any online doctor using the Omni Consultation." },
-  { question: "Are emergency services available?", answer: "Yes! Our emergency services are 24/7 for critical cases." },
+/* ===== HOSPITALS ===== */
+const hospitals = [
+  { name: "Central Veterinary Hospital (Dhaka)", lat: 23.7465, lng: 90.3742 },
+  { name: "Pet Care Clinic (Mirpur)", lat: 23.8069, lng: 90.3687 },
+  { name: "Banani Pet Hospital", lat: 23.7935, lng: 90.4066 },
 ];
 
-const Medical = () => {
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [showMap, setShowMap] = useState(false);
+/* ===== DISTANCE ===== */
+const getDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) ** 2;
+
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+};
+
+export default function Medical() {
+  const [selected, setSelected] = useState(null);
+  const [booked, setBooked] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [search, setSearch] = useState("");
 
-  // Filter services by category
-  const filteredServices = services.filter(service => filter === "All" || service.category === filter);
+  const [doctorId, setDoctorId] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+
+  const [userLocation, setUserLocation] = useState(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("booked");
+    if (saved) setBooked(JSON.parse(saved));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("booked", JSON.stringify(booked));
+  }, [booked]);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition((pos) => {
+      setUserLocation({
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude,
+      });
+    });
+  }, []);
+
+  const filtered = services.filter(
+    (s) =>
+      (filter === "All" || s.category === filter) &&
+      s.title.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const sortedHospitals = userLocation
+    ? [...hospitals].sort(
+        (a, b) =>
+          getDistance(userLocation.lat, userLocation.lng, a.lat, a.lng) -
+          getDistance(userLocation.lat, userLocation.lng, b.lat, b.lng)
+      )
+    : hospitals;
+
+  const handleBook = (item) => {
+    if (!doctorId || !date || !time) {
+      alert("Doctor, Date & Time select korte hobe!");
+      return;
+    }
+
+    const doctor = doctors.find((d) => d.id === Number(doctorId));
+
+    const newBooking = {
+      id: `${item.id}-${doctorId}-${date}-${time}`,
+      service: item,
+      doctor,
+      date,
+      time,
+    };
+
+    setBooked((prev) => {
+      if (prev.find((b) => b.id === newBooking.id)) return prev;
+      return [...prev, newBooking];
+    });
+
+    setSelected(null);
+    setDoctorId("");
+    setDate("");
+    setTime("");
+  };
+
+  const handleCancel = (id) => {
+    setBooked((prev) => prev.filter((b) => b.id !== id));
+  };
 
   return (
-    <div className="min-h-screen bg-green-50 py-16 px-6">
-      <h1 className="text-5xl md:text-6xl font-bold text-green-700 text-center mb-12">
-        Animal Care & Medical Services
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-green-100 text-gray-900 px-6 py-12">
+
+      {/* HEADER */}
+      <h1 className="text-4xl font-bold text-green-900 text-center mb-6">
+        🇧🇩 Pet Care & Veterinary System
       </h1>
 
-      {/* Filter / Categories */}
-      <div className="flex justify-center gap-4 mb-12 flex-wrap">
-        {["All", "General", "Dental", "Online"].map(cat => (
+      {/* SEARCH */}
+      <div className="max-w-md mx-auto mb-8 relative">
+        <FaSearch className="absolute top-3 left-3 text-gray-500" />
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search services..."
+          className="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 bg-white text-gray-900 placeholder-gray-500"
+        />
+      </div>
+
+      {/* FILTER */}
+      <div className="flex justify-center gap-3 mb-10 flex-wrap">
+        {["All", "General", "Dental", "Online"].map((cat) => (
           <button
             key={cat}
             onClick={() => setFilter(cat)}
-            className={`px-6 py-2 rounded-xl font-semibold transition ${filter === cat ? "bg-green-500 text-white" : "bg-green-100 text-green-800 hover:bg-green-200"}`}
+            className={`px-4 py-2 rounded-xl font-semibold ${
+              filter === cat
+                ? "bg-green-700 text-white"
+                : "bg-white border border-gray-300 text-green-800"
+            }`}
           >
             {cat}
           </button>
         ))}
       </div>
 
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Services Column */}
-        <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredServices.map(service => (
+      {/* SERVICES + DOCTORS */}
+      <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
+
+        {/* SERVICES */}
+        <div className="lg:col-span-2 grid md:grid-cols-2 gap-6">
+          {filtered.map((s) => (
             <div
-              key={service.id}
-              onClick={() => { setSelectedItem(service); setShowMap(false); }}
-              className="bg-white rounded-3xl shadow-xl p-6 text-center border-2 border-green-100 cursor-pointer hover:scale-105 transition-transform duration-300 relative"
+              key={s.id}
+              className="bg-white p-6 rounded-2xl shadow-md border border-gray-200 text-gray-900"
+              onClick={() => setSelected(s)}
             >
-              {service.emergency && (
-                <span className="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+              {s.emergency && (
+                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full float-right">
                   Emergency
                 </span>
               )}
-              <div className="flex justify-center">{service.icon}</div>
-              <h3 className="text-xl font-bold text-green-800 mb-2">{service.title}</h3>
-              <p className="text-green-700/90 text-sm">{service.description}</p>
+
+              <div className="flex justify-center mb-2">{s.icon}</div>
+
+              <h3 className="text-lg font-bold text-green-900 text-center">
+                {s.title}
+              </h3>
+
+              <p className="text-sm text-gray-800 text-center">
+                {s.description}
+              </p>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelected(s);
+                }}
+                className="mt-4 w-full bg-green-700 text-white py-2 rounded-xl"
+              >
+                Book Now
+              </button>
             </div>
           ))}
         </div>
 
-        {/* Online Doctors Column */}
-        <div className="bg-white rounded-3xl shadow-xl p-6 border-2 border-green-100 h-fit sticky top-24">
-          <h2 className="text-2xl font-bold text-green-700 mb-4">Doctors Online</h2>
-          {onlineDoctors.map(doc => (
-            <div
-              key={doc.id}
-              className="flex items-center justify-between p-3 mb-3 bg-green-50 rounded-xl cursor-pointer hover:bg-green-100"
-              onClick={() => { setSelectedItem(doc); setShowMap(false); }}
-            >
-              <div>
-                <h3 className="font-semibold text-green-800">{doc.name}</h3>
-                <p className="text-green-700 text-sm">{doc.specialty}</p>
-              </div>
-              <div className={`w-3 h-3 rounded-full ${doc.online ? "bg-green-500" : "bg-gray-400"}`} title={doc.online ? "Online" : "Offline"}></div>
+        {/* DOCTORS */}
+        <div className="bg-white p-5 rounded-2xl shadow-md border border-gray-200">
+          <h2 className="text-xl font-bold text-green-900 flex items-center gap-2">
+            <FaUserMd /> Doctors
+          </h2>
+
+          {doctors.map((d) => (
+            <div key={d.id} className="p-3 border border-gray-200 rounded mt-3">
+              <p className="font-semibold text-gray-900">{d.name}</p>
+              <p className="text-sm text-gray-800">{d.specialty}</p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Modal */}
-      {selectedItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-auto p-4">
-          <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full relative">
-            <button onClick={() => setSelectedItem(null)} className="absolute top-4 right-4 text-green-700 font-bold text-2xl">&times;</button>
-            <div className="flex justify-center mb-4">{selectedItem.icon}</div>
-            <h3 className="text-2xl font-bold text-green-800 mb-2">{selectedItem.title || selectedItem.name}</h3>
-            <p className="text-green-700/90 mb-4">{selectedItem.description || selectedItem.specialty}</p>
+      {/* BOOKED */}
+      <div className="max-w-4xl mx-auto mt-14">
+        <h2 className="text-2xl font-bold text-green-900 text-center">
+          Booked Appointments
+        </h2>
 
-            <div className="flex flex-col md:flex-row gap-4">
-              <button className="flex-1 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2">
-                <FaPhone /> Book Now
+        {booked.length === 0 ? (
+          <p className="text-center text-gray-600 mt-3">No bookings yet</p>
+        ) : (
+          booked.map((b) => (
+            <div
+              key={b.id}
+              className="bg-white p-4 mt-3 rounded-xl border border-gray-200 flex justify-between items-center"
+            >
+              <div>
+                <p className="font-bold text-green-900">
+                  {b.service.title}
+                </p>
+                <p className="text-sm text-gray-800">
+                  👨‍⚕️ {b.doctor.name} | 📅 {b.date} | ⏰ {b.time}
+                </p>
+              </div>
+
+              <button
+                onClick={() => handleCancel(b.id)}
+                className="text-red-600 font-semibold"
+              >
+                Cancel
               </button>
-              {selectedItem.online && (
-                <button className="flex-1 bg-green-100 hover:bg-green-200 text-green-800 px-6 py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2">
-                  <FaVideo /> Start Live Consultation
-                </button>
-              )}
-              {selectedItem.mapAvailable && (
-                <button
-                  onClick={() => setShowMap(!showMap)}
-                  className="flex-1 bg-green-100 hover:bg-green-200 text-green-800 px-6 py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2"
-                >
-                  <FaMapMarkerAlt /> See on Map
-                </button>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* HOSPITALS */}
+      <div className="max-w-6xl mx-auto mt-16 grid md:grid-cols-2 gap-6">
+
+        <div className="bg-white p-5 rounded-2xl shadow-md border border-gray-200">
+          <h2 className="text-xl font-bold text-green-900 mb-4">
+            🏥 Closest Hospitals (BD)
+          </h2>
+
+          {sortedHospitals.map((h, i) => (
+            <div key={i} className="p-3 border border-gray-200 rounded mb-3">
+              <p className="font-semibold text-gray-900">{h.name}</p>
+              {userLocation && (
+                <p className="text-sm text-gray-800">
+                  📍{" "}
+                  {getDistance(
+                    userLocation.lat,
+                    userLocation.lng,
+                    h.lat,
+                    h.lng
+                  ).toFixed(2)}{" "}
+                  km away
+                </p>
               )}
             </div>
+          ))}
+        </div>
 
-            {/* Map iframe */}
-            {showMap && selectedItem.mapAvailable && (
-              <div className="mt-6 w-full h-64 rounded-2xl overflow-hidden border-2 border-green-200 shadow-inner">
-                <iframe
-                  title="Pet Clinic Location"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3651.905303782596!2d90.39043557509054!3d23.750903794665554!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b8571b8e5ebd%3A0x7bcb74b7b21f1f33!2sDhaka%2C%20Bangladesh!5e0!3m2!1sen!2sus!4v1694967072224!5m2!1sen!2sus"
-                  className="w-full h-full border-0"
-                  allowFullScreen=""
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                ></iframe>
-              </div>
-            )}
+        {/* MAP */}
+        <div className="bg-white p-5 rounded-2xl shadow-md border border-gray-200">
+          <h2 className="text-xl font-bold text-green-900 mb-4">
+            📍 Live Location Map
+          </h2>
+
+          {userLocation ? (
+            <iframe
+              className="w-full h-[350px] rounded-xl"
+              src={`https://maps.google.com/maps?q=${userLocation.lat},${userLocation.lng}&z=15&output=embed`}
+            />
+          ) : (
+            <p className="text-gray-600">Allow location access</p>
+          )}
+        </div>
+      </div>
+
+      {/* MODAL */}
+      {selected && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-lg p-6 rounded-2xl">
+
+            <h2 className="text-xl font-bold text-green-900">
+              {selected.title}
+            </h2>
+
+            <select
+              className="w-full border border-gray-300 p-2 mt-4"
+              value={doctorId}
+              onChange={(e) => setDoctorId(e.target.value)}
+            >
+              <option value="">Select Doctor</option>
+              {doctors.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="date"
+              className="w-full border border-gray-300 p-2 mt-2"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+            />
+
+            <input
+              type="time"
+              className="w-full border border-gray-300 p-2 mt-2"
+              value={time}
+              onChange={(e) => setTime(e.target.value)}
+            />
+
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => handleBook(selected)}
+                className="w-full bg-green-700 text-white py-2 rounded-xl"
+              >
+                Confirm Book
+              </button>
+
+              <button
+                onClick={() => setSelected(null)}
+                className="w-full bg-gray-200 py-2 rounded-xl"
+              >
+                Close
+              </button>
+            </div>
+
           </div>
         </div>
       )}
-
-      {/* FAQ / Tips Section */}
-      <div className="max-w-4xl mx-auto mt-16">
-        <h2 className="text-3xl font-bold text-green-700 mb-6 text-center">Frequently Asked Questions</h2>
-        {faqs.map((faq, idx) => (
-          <details key={idx} className="mb-4 bg-white p-4 rounded-xl shadow-md border border-green-100">
-            <summary className="font-semibold cursor-pointer">{faq.question}</summary>
-            <p className="mt-2 text-green-700/90">{faq.answer}</p>
-          </details>
-        ))}
-      </div>
     </div>
   );
-};
-
-export default Medical;
+}
