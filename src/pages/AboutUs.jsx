@@ -23,7 +23,7 @@ const AboutUs = () => {
     <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-orange-100 via-yellow-100 to-amber-200 text-center px-4">
       {/* Hero heading */}
       <h1 className="text-5xl md:text-6xl font-bold text-amber-900 animate-bounce drop-shadow-lg mb-6">
-        🐾 Winter Care is Coming Soon!
+        🐾 Next update is Coming Soon!
       </h1>
 
       {/* Live Clock */}
@@ -50,7 +50,7 @@ const AboutUs = () => {
 
       {/* Footer credit */}
       <div className="absolute bottom-6 text-amber-900 text-sm animate-pulse">
-        Developed with ❤️ by <span className="font-bold">Utsho 💎</span>
+        Developed with ❤️ by <span className="font-bold">Red_Coders</span>
       </div>
     </div>
   );
